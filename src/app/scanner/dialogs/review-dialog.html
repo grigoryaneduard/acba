@@ -1,0 +1,23 @@
+<h1 mat-dialog-title>{{file.name}}</h1>
+<mat-form-field class="class-types">
+  <input matInput
+         placeholder="State"
+         aria-label="State"
+         [matAutocomplete]="auto"
+         [formControl]="stateCtrl">
+  <mat-autocomplete #auto="matAutocomplete">
+    <mat-option *ngFor="let state of filteredStates | async" [value]="state.name">
+      <span>{{state.name}}</span>
+    </mat-option>
+  </mat-autocomplete>
+</mat-form-field>
+
+<div mat-dialog-content>
+  <img [src]="file.url" alt="">
+</div>
+
+<div mat-dialog-actions>
+  <button mat-raised-button (click)="onNoClick()">Close</button>
+  <a href="{{data.url}}" mat-raised-button target="_blank">Open Image New Tab</a>
+  <button mat-raised-button color="primary" class="ml-2" (click)="onEdit()">Edit</button>
+</div>

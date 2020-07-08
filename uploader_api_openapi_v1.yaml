@@ -1,0 +1,260 @@
+openapi: 3.0.0
+info:
+  title: ACBA file upload API
+  description: Upload scanned documents.
+  version: 0.0.1
+servers:
+  - url: http://localhost:8080/v1
+paths:
+  /files:
+    get:
+      summary: GetFileList
+      operationId: GetFileList
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            format: int64
+            default: 30
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            format: int64
+            default: 0
+        - name: IDs
+          in: query
+          schema:
+            type: array
+            items:
+              type:
+                string
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileList'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /files/{id}:
+    put:
+      summary: UpdateFile
+      operationId: UpdateFile
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileUpdateParams'
+      responses:
+        304:
+          description: Not Modified
+        200:
+          description: OK
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /files/upload:
+    post:
+      summary: Upload scanned document
+      operationId: Upload
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - name
+                - files
+              properties:
+                name:
+                  type: string
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileList'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /classes:
+    get:
+      summary: Get All
+      operationId: GetFileClasses
+      responses:
+        201:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FileClass'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Create File Class
+      operationId: CreateFileClass
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileClass'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FileClass'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /classes/{id}:
+    put:
+      summary: Update File Class
+      operationId: UpdateFileClass
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileClass'
+      responses:
+        204:
+          description: OK
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete File Class
+      operationId: DeleteFileClass
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    FileClass:
+      type: object
+      required:
+        - name
+        - short_name
+        - identifiers
+      properties:
+        name:
+          type: string
+        short_name:
+          type: string
+        identifiers:
+          type: array
+          items:
+            type: string
+    File:
+      type: object
+      required:
+        - id
+        - name
+        - extension
+        - url
+        - class
+        - size
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        extension:
+          type: string
+        url:
+          type: string
+        size:
+          type: integer
+          format: int64
+        class:
+          $ref: '#/components/schemas/FileClass'
+    FileUpdateParams:
+      type: object
+      required:
+        - name
+        - extension
+        - url
+        - class_id
+        - size
+      properties:
+        name:
+          type: string
+        extension:
+          type: string
+        url:
+          type: string
+        class_id:
+          type: string
+        size:
+          type: integer
+          format: int64
+    FileList:
+      type: array
+      items:
+        $ref: '#/components/schemas/File'

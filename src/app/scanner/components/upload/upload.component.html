@@ -1,0 +1,47 @@
+<ngx-file-drop
+  accept=".png, .jpg, .jpeg, .pdf"
+  showBrowseBtn="true"
+  multiple="true"
+  dropZoneClassName="cusDropZone"
+  contentClassName="cusDropContent"
+  dropZoneLabel="Drop files here"
+  (onFileDrop)="dropped($event)"
+>
+  <ng-template
+    ngx-file-drop-content-tmp
+    let-openFileSelector="openFileSelector"
+  >
+    Drag files to scan
+    <button mat-raised-button color="primary" (click)="openFileSelector()">Select Files</button>
+  </ng-template>
+</ngx-file-drop>
+
+<mat-list>
+  <div mat-subheader>Scanned Files</div>
+  <div class="empty-list" *ngIf="(files$ | async).length == 0">
+    <i>First select files</i>
+  </div>
+
+  <!-- refactor status part -->
+  <mat-list-item *ngFor="let file of (files$ | async) as files">
+    <mat-icon mat-list-icon>image</mat-icon>
+    <div mat-line>{{file.name}}</div>
+    <p matLine>{{file.class?.name}}</p>
+    <div *ngIf="file.url != null"><a (click)="openDialog(file)" mat-raised-button class="ml-2">Review</a>
+    </div>
+    <mat-icon *ngIf="file.class != null && file.id != null" color="success" class="ml-2">
+      check_circle_outline
+    </mat-icon>
+    <mat-icon *ngIf="file.class == null && file.id != null" color="warn" class="ml-2">cancel
+    </mat-icon>
+    <mat-icon *ngIf="file.id == null" color="primary" class="ml-2">timelapse</mat-icon>
+    <mat-divider *ngIf="files.length != 1"></mat-divider>
+  </mat-list-item>
+</mat-list>
+
+<div mat-dialog-actions align="end">
+  <button [disabled]="(files$ | async).length === 0 || (filesLoading$ | async) === true"
+          (click)="onConfirm()" mat-raised-button
+          color="warn">Confirm
+  </button>
+</div>
